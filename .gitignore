@@ -1,0 +1,9 @@
+genome/*
+annotation/*
+motifs/*
+sarus_results/*
+matrices/*
+promoters/*.fa
+promoters/*.bed
+*.jar
+*.gz
