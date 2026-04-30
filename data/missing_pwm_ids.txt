@@ -1,2 +1,1 @@
-]633;E;read -r id;4e6d2123-650a-48be-b42f-692ccd054c38]633;CMYRFL.H13CORE.0.PSG.A
-TTF1.H13CORE.0.P.C
+No missing motif files. Two IDs were corrected: MYRFL.H13CORE.0.PSG.A -> MYRFL.H13CORE.0.P.C; TTF1.H13CORE.0.P.C -> TTF1.H13CORE.0.PSG.A
