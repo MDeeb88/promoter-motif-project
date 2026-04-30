@@ -15,17 +15,8 @@ sarus_dir = sys.argv[2]
 threshold = float(sys.argv[3])
 out_tsv = sys.argv[4]
 
-PROMOTER_COL = 0
-SCORE_COL = -1
-
 
 def clean_promoter_id(header):
-    """
-    bedtools adds this suffix:
-    promoter_id::chrom:start-end(strand)
-
-    We keep only the original promoter_id before ::
-    """
     header = header.strip()
     if header.startswith(">"):
         header = header[1:]
@@ -49,7 +40,6 @@ promoter_set = set(promoter_ids)
 counts = defaultdict(lambda: defaultdict(int))
 
 sarus_files = sorted(glob.glob(os.path.join(sarus_dir, "*.sarus.tsv")))
-
 tf_ids = []
 
 for sarus_file in sarus_files:
@@ -58,29 +48,34 @@ for sarus_file in sarus_files:
 
     print(f"Parsing {tf_id}", file=sys.stderr)
 
+    current_promoter = None
+
     with open(sarus_file) as f:
         for line in f:
             line = line.strip()
 
-            if not line or line.startswith("#"):
+            if not line:
+                continue
+
+            if line.startswith(">"):
+                current_promoter = clean_promoter_id(line)
+                continue
+
+            if current_promoter is None:
                 continue
 
             parts = line.split()
 
-            if len(parts) < 2:
+            if len(parts) < 1:
                 continue
 
             try:
-                promoter_id = clean_promoter_id(parts[PROMOTER_COL])
-                score = float(parts[SCORE_COL])
-            except Exception:
+                score = float(parts[0])  # score is FIRST column
+            except:
                 continue
 
-            if promoter_id not in promoter_set:
-                continue
-
-            if score >= threshold:
-                counts[promoter_id][tf_id] += 1
+            if current_promoter in promoter_set and score >= threshold:
+                counts[current_promoter][tf_id] += 1
 
 
 df = pd.DataFrame(0, index=promoter_ids, columns=tf_ids, dtype=int)
